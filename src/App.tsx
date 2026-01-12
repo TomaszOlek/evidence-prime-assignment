@@ -1,4 +1,4 @@
-import { useState, useRef, type JSX } from "react";
+import { useState, useRef, type JSX, useMemo } from "react";
 import "./App.css";
 
 /**
@@ -6,6 +6,12 @@ import "./App.css";
  */
 type GridPoint = [number, number];
 type RuneMap = Record<number, GridPoint[]>;
+
+type DigitPosition = {
+  flipX: boolean;
+  flipY: boolean;
+  keyPrefix: string;
+};
 
 /**
  * Constants
@@ -115,18 +121,19 @@ function generateRuneLines(value: number): JSX.Element[] {
 
   const digits = value.toString().padStart(4, "0").split("").map(Number);
 
-  const positions: [boolean, boolean, string][] = [
-    [true, true, "thousands"],
-    [true, false, "hundreds"],
-    [false, true, "tens"],
-    [false, false, "ones"],
+  const positions: DigitPosition[] = [
+    { flipX: true, flipY: true, keyPrefix: "thousands" },
+    { flipX: true, flipY: false, keyPrefix: "hundreds" },
+    { flipX: false, flipY: true, keyPrefix: "tens" },
+    { flipX: false, flipY: false, keyPrefix: "ones" },
   ];
 
   return digits
     .map((digit, i) => {
       if (digit === 0) return [];
-      const [flipXFlag, flipYFlag, keyPrefix] = positions[i];
-      return generateDigitLines(digit, flipXFlag, flipYFlag, keyPrefix);
+
+      const { flipX, flipY, keyPrefix } = positions[i];
+      return generateDigitLines(digit, flipX, flipY, keyPrefix);
     })
     .flat();
 }
@@ -137,6 +144,8 @@ function generateRuneLines(value: number): JSX.Element[] {
 function App() {
   const [value, setValue] = useState<number>(1);
   const svgRef = useRef<SVGSVGElement | null>(null);
+
+  const runeLines = useMemo(() => generateRuneLines(value), [value]);
 
   const downloadSVG = () => {
     if (!svgRef.current) return;
@@ -184,7 +193,7 @@ function App() {
             else setValue(num);
           }}
           onBlur={() => {
-            if (value < RUNE_MIN_VALUE) setValue(RUNE_MIN_VALUE);
+            if (!!value) setValue(RUNE_MIN_VALUE);
           }}
         />
       </div>
@@ -207,7 +216,7 @@ function App() {
             strokeLinecap="round"
           />
 
-          {generateRuneLines(value)}
+          {runeLines}
         </svg>
       </div>
 
