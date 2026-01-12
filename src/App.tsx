@@ -10,7 +10,7 @@ type RuneMap = Record<number, GridPoint[]>;
 /**
  * Constants
  */
-const RUNE_COORDINATES: RuneMap = {
+const BASE_RUNE_COORDINATES: RuneMap = {
   1: [
     [1, 0],
     [2, 0],
@@ -88,7 +88,7 @@ function generateDigitLines(
   flipYFlag: boolean,
   keyPrefix: string
 ): JSX.Element[] {
-  let points = RUNE_COORDINATES[digit] ?? [];
+  let points = BASE_RUNE_COORDINATES[digit] ?? [];
   if (flipXFlag) points = points.map(flipX);
   if (flipYFlag) points = points.map(flipY);
 
