@@ -92,7 +92,7 @@ function generateDigitLines(
   digit: number,
   flipXFlag: boolean,
   flipYFlag: boolean,
-  keyPrefix: string
+  keyPrefix: string,
 ): JSX.Element[] {
   let points = BASE_RUNE_COORDINATES[digit] ?? [];
   if (flipXFlag) points = points.map(flipX);
@@ -174,26 +174,29 @@ function App() {
         <label htmlFor="number-input">Enter a number (1–9999)</label>
         <input
           id="number-input"
-          type="number"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           min={RUNE_MIN_VALUE}
           max={RUNE_MAX_VALUE}
           value={value === 0 ? "" : value}
           onChange={(e) => {
             const val = e.target.value;
+            if (!/^\d*$/.test(val)) return;
 
             if (val === "") {
               setValue(0);
               return;
             }
 
-            const num = Number(val);
+            const num = Math.floor(Number(val));
 
             if (num < RUNE_MIN_VALUE) setValue(RUNE_MIN_VALUE);
             else if (num > RUNE_MAX_VALUE) setValue(RUNE_MAX_VALUE);
             else setValue(num);
           }}
           onBlur={() => {
-            if (!!value) setValue(RUNE_MIN_VALUE);
+            if (!value) setValue(RUNE_MIN_VALUE);
           }}
         />
       </div>
